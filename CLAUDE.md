@@ -5,6 +5,8 @@
 - Javalin (HTTP), Flyway (migrations), PostgreSQL 18 + pgvector
 - JUnit + Testcontainers for tests
 - Versions: `gradle/libs.versions.toml`, `.sdkmanrc`, `compose.yaml`, `.github/workflows/ci.yml`
+- JDK version: change `.sdkmanrc` and `.github/workflows/ci.yml` together
+- pgvector image tag: change `gradle/libs.versions.toml` and `compose.yaml` together
 
 ## Package layout (`src/main/kotlin/hireline`)
 - `Main.kt`: `main()` and `start()`, wires everything together
