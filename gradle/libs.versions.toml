@@ -7,6 +7,8 @@ postgresql = "42.7.15"
 slf4j = "2.0.20"
 junit = "6.1.3"
 testcontainers = "2.0.5"
+# Not a Gradle dependency: the Docker image the tests run. compose.yaml repeats it.
+pgvector-image = "pgvector/pgvector:0.8.7-pg18-trixie"
 
 [libraries]
 javalin = { module = "io.javalin:javalin", version.ref = "javalin" }
