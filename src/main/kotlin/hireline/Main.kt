@@ -20,10 +20,6 @@ fun main() {
     }
 }
 
-/**
- * The startup sequence from docs/design/m0-skeleton.md. The HTTP server starts
- * only after migrations succeed. Returns the running server so callers can stop it.
- */
 fun start(config: Config): Javalin {
     log.info("Starting with {}", config)
     val dataSource = createDataSource(config)

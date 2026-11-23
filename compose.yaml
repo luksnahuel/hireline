@@ -1,5 +1,4 @@
-# Local development only. The app runs from Gradle, not from here.
-# Keep the image tag in sync with pgvector-image in gradle/libs.versions.toml.
+# Local development only. Keep the image tag in sync with gradle/libs.versions.toml.
 services:
   postgres:
     image: pgvector/pgvector:0.8.7-pg18-trixie
@@ -10,16 +9,13 @@ services:
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
-      # Postgres 18+ images keep data under /var/lib/postgresql (not .../data).
       - postgres-data:/var/lib/postgresql
     healthcheck:
-      # SELECT 1 over TCP, like the app's /health. Over TCP because the image's
-      # first-run init server listens only on the Unix socket: a socket check
-      # could report healthy before init finishes and the real server starts.
+      # Over TCP: on first run, the init server listens only on the Unix socket.
       test: ["CMD-SHELL", "psql -h 127.0.0.1 -U hireline -d hireline -tAc 'SELECT 1'"]
-      start_period: 30s   # startup grace: failures in this window don't count
-      start_interval: 1s  # check every 1s during start_period (Docker Engine 25+)
-      interval: 10s       # after that, check every 10s
+      start_period: 30s
+      start_interval: 1s
+      interval: 10s
       timeout: 3s
       retries: 3
 

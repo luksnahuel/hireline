@@ -1,13 +1,12 @@
 package hireline.platform
 
-/** App configuration. Comes from environment variables; nothing is hardcoded. */
 class Config(
     val dbUrl: String,
     val dbUser: String,
     val dbPassword: String,
     val httpPort: Int,
 ) {
-    // Never print the password.
+    // Leaves out the password, so the config can be logged.
     override fun toString() = "Config(dbUrl=$dbUrl, dbUser=$dbUser, httpPort=$httpPort)"
 
     companion object {
