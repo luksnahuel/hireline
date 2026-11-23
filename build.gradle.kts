@@ -16,6 +16,7 @@ application {
 }
 
 dependencies {
+    implementation(libs.javalin)
     implementation(libs.postgresql)
     implementation(libs.flyway.core)
     runtimeOnly(libs.flyway.postgresql)
