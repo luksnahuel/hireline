@@ -12,7 +12,7 @@ kotlin {
 }
 
 application {
-    mainClass = "hireline.platform.MainKt"
+    mainClass = "hireline.MainKt"
 }
 
 dependencies {

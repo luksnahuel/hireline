@@ -1,9 +1,13 @@
-package hireline.platform
+package hireline
 
+import hireline.platform.Config
+import hireline.platform.createDataSource
+import hireline.platform.runMigrations
+import hireline.platform.waitForDatabase
 import org.slf4j.LoggerFactory
 import kotlin.system.exitProcess
 
-private val log = LoggerFactory.getLogger("hireline.platform.Main")
+private val log = LoggerFactory.getLogger("hireline.Main")
 
 fun main() {
     try {
