@@ -1,43 +1,55 @@
 # M0 design: walking skeleton
 
-Written 2026-11-21 to 2026-11-23. Under each heading, my latest answer, verbatim. Lines marked **Open** are still to decide.
+## Goal
+Prove the wiring end to end (HTTP → app → Postgres) before building any feature. M0 has no LLM call and no domain tables.
+
+## Scope
+- A Kotlin + Javalin app with one endpoint: `GET /health`.
+- Postgres with the pgvector extension, running in Docker for local development. pgvector is enabled from M0, not M2: it's only an extension, and it keeps the skeleton representative.
+- Flyway runs the migrations when the app starts.
+- CI runs the test suite on every push.
+- One instance. No load balancer, no deploy.
 
 ## What's stored
-> pgvector could be paid at milestone 0 or 2 I don't see the difference but for the walking skeleton being as healthy and as representative that it can I would add it at 0. Because it is just an extension, right?
+- No domain data yet.
+- `flyway_schema_history`, Flyway's own table, which records the migrations applied to this database.
 
-**Open:** the exact Postgres + pgvector image tag, and how to check it really ships pgvector.
+## Startup sequence
+1. **Read config.** The database URL comes from config and is never hardcoded, because the tests pass their own.
+2. **Connect to Postgres.** If it isn't ready, retry: that error is transient. Two attempts, a few minutes apart, then exit with an error.
+3. **Run migrations.** On any failure, exit and don't retry: that error is permanent, and retrying won't fix it.
+4. **Start the HTTP server.** It starts only after migrations succeed, so a running app implies an up-to-date schema.
 
 ## What can fail at startup
-
-### Postgres isn't ready
-> I guess it can start and retry a number of times to boot Postgres up. Meanwhile a health check should be "negative" and after some attempts try to restart or just exit.
-
-> I guess two at max with a wait of a couple of minutes less than 5 from each try. Since this is starting time is not really a constraint a clean startup of the service could take up to 5 to 10 minutes easily.
-
-> That order should be the one. Migrations should be the most critical step in order to be live because the data is the most important part in a system. So if we can't ensure migrations are up to date we can't serve the HTTP server and start receiving requests.
-
-**Open:** measure how long Postgres takes to accept connections, then size the retries to it.
-
-### A migration fails
-> If this runs with a transcation it shouldn't the migration engine should take care of that for sure.
-
-> That some parts of the migration were applied and some didn't. A manual rollback should be executed.
-
-> A migration that fails most of the time won't be fixed by retrying but rather checking the integrity of the DB and the data so at the first fail the app shouldn't start up.
+| Failure | What happens |
+|---|---|
+| Postgres not ready | Retry (step 2), then exit with an error |
+| A migration fails | Each migration runs in a transaction. Postgres rolls back schema changes, so nothing is half-applied. Flyway marks it failed, the app exits, and I fix the migration |
+| A migration that can't run in a transaction fails (e.g. `CREATE INDEX CONCURRENTLY`) | It may be half-applied: manual rollback, then `flyway repair` to clear the failed entry |
+| No database in CI | The tests start their own (see below) |
 
 ## /health
-> 503 is temporary. No deploy yeah but a health check step shouldn't be a big deal. A test never calls /health makes no sense.
+- Runs `SELECT 1` against Postgres.
+- `200` if it succeeds. `503 Service Unavailable` if Postgres is unreachable: the condition is temporary, not a bug (`500`).
+- Doesn't call the LLM provider.
+- Read in M0 by the end-to-end test in CI, and by me.
+- With several instances behind a load balancer, the Postgres check would become a *readiness* check (stop sending traffic), separate from a *liveness* check (restart the process). Not needed for one instance.
 
-> I guess not. Or well not for this iteration or this stage of what we are trying to build. But I guess defining what a health check should consider is something we must do.
+## Migrations
+- Each schema change is its own numbered file, applied once and in order. The history table records which ones each database already has, so every database (my laptop, CI's fresh one) reaches the same state by the same steps.
+- Flyway stores a checksum per migration, so an edited migration is detected. Never edit a migration that has already run; add a new one (e.g. a column rename is a new migration).
+- Flyway takes a lock in Postgres, so two processes starting at once don't both migrate.
 
 ## How I'll know it works
-> Is a health status check a good test? We are doing a walking skeleton in M0 the test itself shouldn't matter a lot but I guess we can do a /health test. Postgres up = 200 Postgres down = 503. Postgres stopped I don't know. To know it's alive I guess we can do a readiness prove like "SELECT 1;"
+- **End-to-end test:** it starts the real app and sends real HTTP requests. Postgres comes from a Docker container that the test starts and removes (Testcontainers), so no data leaks between runs. The test passes that container's URL to the app through config.
+  - Postgres up: `GET /health` → `200`.
+  - Postgres down (the test stops the container): `GET /health` → `503`.
+- **Demo checks:**
+  - A migration that creates a table and then fails: afterwards, the table doesn't exist.
+  - Edit a migration that already ran, restart, and see what Flyway does.
+- CI runs the test on every push.
 
-> It should send a real http request for a test server that startups for the e2e test.
-
-> It should be orchestrated by the test but mainly the app configuration and how is started.
-
-## Migrations (Flyway)
-> Concurrency and versioning.
-
-> add a migration for that alter table change.
+## Open
+- The exact Postgres + pgvector image tag, and how to check that it ships pgvector.
+- How long Postgres takes to accept connections. Size the retries in step 2 to it.
+- What the app does if its HTTP port is already taken.
