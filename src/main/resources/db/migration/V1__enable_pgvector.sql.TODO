@@ -1,7 +1,0 @@
-TODO(you): write V1, the migration that enables the pgvector extension.
-
-Rename this file to V1__enable_pgvector.sql and replace this text with the SQL.
-
-It is not a .sql file yet on purpose: Flyway only picks up *.sql files. If an
-empty placeholder V1 ran, Flyway would record its checksum, and every database
-that ran it would fail validation once you wrote the real V1.
