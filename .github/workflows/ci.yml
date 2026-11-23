@@ -1,0 +1,23 @@
+name: CI
+
+on: push
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - uses: actions/setup-java@v6.3.0
+        with:
+          java-version-file: .sdkmanrc
+
+      - uses: gradle/actions/setup-gradle@v6.4.1
+        with:
+          # Open-source cache. The default ("enhanced") requires accepting Gradle's commercial terms.
+          cache-provider: basic
+
+      - run: ./gradlew test
