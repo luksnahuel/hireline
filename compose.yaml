@@ -17,9 +17,11 @@ services:
       # first-run init server listens only on the Unix socket: a socket check
       # could report healthy before init finishes and the real server starts.
       test: ["CMD-SHELL", "psql -h 127.0.0.1 -U hireline -d hireline -tAc 'SELECT 1'"]
-      interval: 2s
+      start_period: 30s   # startup grace: failures in this window don't count
+      start_interval: 1s  # check every 1s during start_period (Docker Engine 25+)
+      interval: 10s       # after that, check every 10s
       timeout: 3s
-      retries: 15
+      retries: 3
 
 volumes:
   postgres-data:
