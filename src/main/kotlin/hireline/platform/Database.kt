@@ -11,7 +11,6 @@ fun createDataSource(config: Config): DataSource =
         connectTimeout = 3 // seconds
     }
 
-// TODO: retry with a bounded number of attempts, then throw (main exits with status 1).
 fun waitForDatabase(dataSource: DataSource) {
-    dataSource.connection.use { }
+    retry { dataSource.connection.use { } }
 }
