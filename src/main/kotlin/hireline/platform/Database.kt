@@ -12,5 +12,5 @@ fun createDataSource(config: Config): DataSource =
     }
 
 fun waitForDatabase(dataSource: DataSource) {
-    retry { dataSource.connection.use { } }
+    retryDatabaseConnection { dataSource.connection.use { } }
 }

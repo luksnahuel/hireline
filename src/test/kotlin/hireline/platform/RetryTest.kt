@@ -51,5 +51,5 @@ class RetryTest {
     }
 
     private fun retryConnection(timeoutMillis: Int, action: () -> Unit) =
-        retry(delay = 10.milliseconds, timeout = timeoutMillis.milliseconds, action = action)
+        retryDatabaseConnection(delay = 10.milliseconds, timeout = timeoutMillis.milliseconds, action = action)
 }

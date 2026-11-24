@@ -10,9 +10,9 @@ import kotlin.time.TimeSource
 
 private val log = LoggerFactory.getLogger("hireline.platform.Retry")
 
-private const val CONNECTION_FAILURE = "08001"
+private const val UNABLE_TO_CONNECT_SQLSTATE = "08001"
 
-fun retry(
+fun retryDatabaseConnection(
     delay: Duration = 1.seconds,
     timeout: Duration = 60.seconds,
     action: () -> Unit,
@@ -25,7 +25,7 @@ fun retry(
             action()
             return
         } catch (e: SQLException) {
-            if (e.sqlState != CONNECTION_FAILURE) {
+            if (e.sqlState != UNABLE_TO_CONNECT_SQLSTATE) {
                 log.error("not retrying: SQLState {}", e.sqlState)
                 throw e
             }
