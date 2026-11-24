@@ -19,5 +19,6 @@
 - Build: `./gradlew build`
 - Test: `./gradlew test` (needs Docker; on Colima, export `DOCKER_HOST=unix://$HOME/.colima/default/docker.sock` and `TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock`)
 - Local Postgres: `docker compose up -d --wait`
-- Run: `DB_URL=jdbc:postgresql://localhost:5432/hireline DB_USER=hireline DB_PASSWORD=hireline HTTP_PORT=7070 ./gradlew run`
+- Local env: `cp .env.example .env` (`.env` is gitignored; only `.env.example` is committed)
+- Run: `./gradlew run` (reads `.env`; variables already set in the shell win)
 - Health: `curl localhost:7070/health`
