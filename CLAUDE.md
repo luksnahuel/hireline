@@ -20,5 +20,5 @@
 - Test: `./gradlew test` (needs Docker; on Colima, export `DOCKER_HOST=unix://$HOME/.colima/default/docker.sock` and `TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock`)
 - Local Postgres: `docker compose up -d --wait`
 - Local env: `cp .env.example .env` (`.env` is gitignored; only `.env.example` is committed)
-- Run: `./gradlew run` (reads `.env`; variables already set in the shell win)
+- Run: `./gradlew run` (the app reads `.env` via dotenv-java; variables already set in the shell win)
 - Health: `curl localhost:7070/health`

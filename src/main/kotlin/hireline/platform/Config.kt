@@ -1,5 +1,10 @@
 package hireline.platform
 
+import io.github.cdimascio.dotenv.Dotenv
+
+private fun loadEnv(): Map<String, String> =
+    Dotenv.configure().ignoreIfMissing().load().entries().associate { it.key to it.value }
+
 class Config(
     val dbUrl: String,
     val dbUser: String,
@@ -10,7 +15,7 @@ class Config(
     override fun toString() = "Config(dbUrl=$dbUrl, dbUser=$dbUser, httpPort=$httpPort)"
 
     companion object {
-        fun fromEnv(env: Map<String, String> = System.getenv()): Config {
+        fun fromEnv(env: Map<String, String> = loadEnv()): Config {
             val names = listOf("DB_URL", "DB_USER", "DB_PASSWORD", "HTTP_PORT")
             val missing = names.filter { env[it].isNullOrBlank() }
             require(missing.isEmpty()) { "Missing environment variables: ${missing.joinToString()}" }

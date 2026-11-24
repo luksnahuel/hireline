@@ -5,6 +5,7 @@ javalin = "7.3.0"
 flyway = "13.13.0"
 postgresql = "42.7.15"
 slf4j = "2.0.20"
+dotenv = "3.2.0"
 junit = "6.1.3"
 testcontainers = "2.0.5"
 # Docker image for the tests. Keep in sync with compose.yaml.
@@ -17,6 +18,7 @@ flyway-postgresql = { module = "org.flywaydb:flyway-database-postgresql", versio
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 slf4j-simple ={ module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
+dotenv = { module = "io.github.cdimascio:dotenv-java", version.ref = "dotenv" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
