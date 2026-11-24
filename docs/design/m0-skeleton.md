@@ -24,7 +24,7 @@ Prove the wiring end to end (HTTP → app → Postgres) before building any feat
 | Failure | What happens |
 |---|---|
 | Postgres not ready | Retry (step 2), then exit with an error |
-| A migration fails | Each migration runs in a transaction. Postgres rolls back schema changes, so nothing is half-applied. Flyway marks it failed, the app exits, and I fix the migration |
+| A migration fails | Each migration runs in a transaction. Postgres rolls back schema changes, so nothing is half-applied, and there's no row for it in `flyway_schema_history` either. The app exits, I fix the migration and restart |
 | A migration that can't run in a transaction fails (e.g. `CREATE INDEX CONCURRENTLY`) | It may be half-applied: manual rollback, then `flyway repair` to clear the failed entry |
 | No database in CI | The tests start their own (see below) |
 
@@ -45,8 +45,8 @@ Prove the wiring end to end (HTTP → app → Postgres) before building any feat
   - Postgres up: `GET /health` → `200`.
   - Postgres down (the test stops the container): `GET /health` → `503`.
 - **Demo checks:**
-  - A migration that creates a table and then fails: afterwards, the table doesn't exist.
-  - Edit a migration that already ran, restart, and see what Flyway does.
+  - (a) A migration that creates a table and then fails. Done: afterwards the table wasn't there, and `flyway_schema_history` had no V2 row.
+  - (b) Edit a migration that already ran, restart, and see what Flyway does. Skipped: the checksum check stops migrate and the app exits, so there's nothing else to see.
 - CI runs the test on every push.
 
 ## Open
