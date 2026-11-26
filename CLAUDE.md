@@ -1,9 +1,15 @@
 # hireline
 
+@docs/workflow.md
+@docs/conventions.md
+
+Before writing or changing tests, read docs/testing.md
+
 ## Stack
 - Kotlin on JDK 25 (Temurin), Gradle with Kotlin DSL and the wrapper
 - Javalin (HTTP), Flyway (migrations), PostgreSQL 18 + pgvector
 - JUnit + Testcontainers for tests
+- The LLM is called over plain HTTP, with no client library
 - Versions: `gradle/libs.versions.toml`, `.sdkmanrc`, `compose.yaml`, `.github/workflows/ci.yml`
 - JDK version: change `.sdkmanrc` and `.github/workflows/ci.yml` together
 - pgvector image tag: change `gradle/libs.versions.toml` and `compose.yaml` together
